@@ -6,11 +6,10 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface Word {
-  id: number;
+export interface AddToNotebookRequest {
   english: string;
   turkish: string;
-  pronunciation: string;
-  example: string;
-  exampleTurkish: string;
+  pronunciation?: string | null;
+  example?: string | null;
+  lessonId?: number | null;
 }

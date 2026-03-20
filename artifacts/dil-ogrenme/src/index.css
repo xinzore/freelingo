@@ -47,27 +47,27 @@
   
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 104 98% 40%;
+  --ring: 130 100% 40%;
   
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
 
   /* Gamified Primary (Duolingo Green) */
-  --primary: 104 98% 40%;
+  --primary: 130 100% 40%;
   --primary-foreground: 0 0% 100%;
-  --primary-dark: 104 98% 30%;
+  --primary-dark: 130 100% 30%;
 
   /* Secondary (Sky Blue) */
-  --secondary: 199 89% 48%;
+  --secondary: 200 90% 54%;
   --secondary-foreground: 0 0% 100%;
-  --secondary-dark: 199 89% 38%;
+  --secondary-dark: 200 90% 44%;
 
   /* Muted / Neutral */
   --muted: 210 40% 96%;
   --muted-foreground: 215 16% 47%;
 
-  /* Accent (Purple) */
-  --accent: 262 83% 58%;
+  /* Accent (Yellow/Orange) */
+  --accent: 47 100% 50%;
   --accent-foreground: 0 0% 100%;
 
   /* Destructive (Red) */
@@ -76,9 +76,9 @@
   --destructive-dark: 0 84% 50%;
 
   /* Success (Bright Green for correct answers) */
-  --success: 104 98% 40%;
+  --success: 130 100% 40%;
   --success-foreground: 0 0% 100%;
-  --success-dark: 104 98% 30%;
+  --success-dark: 130 100% 30%;
 
   /* Warning (Orange for streak/fire) */
   --warning: 35 100% 55%;

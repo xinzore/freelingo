@@ -1,10 +1,11 @@
 import { useGetLessons, useGetProgress } from "@workspace/api-client-react";
 import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
-import { Star, Check, Lock } from "lucide-react";
+import { Star, Check, Lock, Target } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { ProgressBar } from "@/components/ui/progress-bar";
 
 export function Home() {
   const { data: lessons, isLoading: lessonsLoading } = useGetLessons();
@@ -22,11 +23,41 @@ export function Home() {
   const completedIds = progress?.completedLessons || [];
   const currentLessonId = lessons?.find(l => !completedIds.includes(l.id))?.id;
 
+  const dailyXp = progress?.dailyXp || 0;
+  const dailyGoal = progress?.dailyGoal || 50;
+  const goalProgress = Math.min((dailyXp / dailyGoal) * 100, 100);
+  const goalCompleted = dailyXp >= dailyGoal;
+
   return (
     <div className="min-h-screen bg-background pb-32">
       <TopBar />
       
-      <main className="max-w-md mx-auto pt-8 px-4 flex flex-col items-center">
+      <main className="max-w-md mx-auto pt-6 px-4 flex flex-col items-center">
+        {/* Daily Goal Card */}
+        <div className={cn(
+          "w-full mb-6 border-2 rounded-2xl p-4 flex flex-col gap-2 transition-colors",
+          goalCompleted ? "bg-green-50 border-green-200" : "bg-white border-border"
+        )}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target className={cn("w-5 h-5", goalCompleted ? "text-green-500" : "text-gray-400")} />
+              <span className="font-display font-bold text-gray-700">Günlük Hedef</span>
+            </div>
+            <span className={cn("font-bold text-sm", goalCompleted ? "text-green-600" : "text-gray-500")}>
+              {dailyXp} / {dailyGoal} XP
+            </span>
+          </div>
+          <ProgressBar 
+            progress={goalProgress} 
+            className={cn("h-3", goalCompleted && "[&>div]:bg-green-500")}
+          />
+          {goalCompleted && (
+            <p className="text-xs font-bold text-green-600 text-center mt-1">
+              Harika! Günlük hedefini tamamladın 🎉
+            </p>
+          )}
+        </div>
+
         <div className="w-full mb-8 bg-white border-2 border-border rounded-2xl p-6 shadow-sm relative overflow-hidden">
           <div className="relative z-10">
             <h1 className="text-2xl font-display font-bold text-gray-800 mb-2">Bölüm 1: Temeller</h1>

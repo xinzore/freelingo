@@ -1,12 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRoute, useLocation } from "wouter";
-import { useGetLesson, useCompleteLesson } from "@workspace/api-client-react";
+import { useGetLesson, useCompleteLesson, useAddToNotebook } from "@workspace/api-client-react";
 import { GamifiedButton } from "@/components/ui/gamified-button";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { X, Heart, AlertCircle, CheckCircle2 } from "lucide-react";
+import { X, Heart, AlertCircle, CheckCircle2, Volume2, PlusCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import type { Word, Question } from "@workspace/api-client-react/src/generated/api.schemas";
 
 type Exercise = 
@@ -44,6 +45,37 @@ export function Lesson() {
   const currentExercise = queue[currentIndex];
   const progress = queue.length > 0 ? (currentIndex / queue.length) * 100 : 0;
 
+  const playBeep = (isCorrect: boolean) => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      if (isCorrect) {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch (e) {
+      // Audio might fail if not interacted first
+    }
+  };
+
   const handleCheck = () => {
     if (!currentExercise) return;
 
@@ -59,6 +91,7 @@ export function Lesson() {
 
     if (isCorrect) {
       setStatus('correct');
+      playBeep(true);
       confetti({
         particleCount: 50,
         spread: 60,
@@ -67,6 +100,7 @@ export function Lesson() {
       });
     } else {
       setStatus('wrong');
+      playBeep(false);
       setHearts(h => Math.max(0, h - 1));
       // Push question to end of queue to try again
       setQueue(prev => [...prev, currentExercise]);
@@ -212,12 +246,12 @@ export function Lesson() {
 
       {/* Bottom Action Bar */}
       <div className={cn(
-        "border-t-2 transition-colors duration-300",
+        "border-t-2 transition-colors duration-300 z-50",
         status === 'idle' ? "bg-white border-border" :
         status === 'correct' ? "bg-green-100 border-green-200" :
         "bg-red-100 border-red-200"
       )}>
-        <div className="p-4 max-w-2xl mx-auto w-full">
+        <div className="p-4 max-w-2xl mx-auto w-full pb-safe">
           
           {/* Feedback messages */}
           <AnimatePresence>
@@ -280,9 +314,48 @@ export function Lesson() {
 // Sub-components for specific exercise types
 
 function WordExercise({ word, isFlipped, setIsFlipped }: { word: Word, isFlipped: boolean, setIsFlipped: (v: boolean) => void }) {
+  const addToNotebookMutation = useAddToNotebook();
+  
+  const speakWord = (text: string, lang = 'en-US') => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.8;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  useEffect(() => {
+    speakWord(word.english);
+  }, [word]);
+
+  const handleAddToNotebook = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await addToNotebookMutation.mutateAsync({
+        data: {
+          wordId: word.id
+        }
+      });
+      toast.success("Kelime defterine eklendi!");
+    } catch (err) {
+      toast.error("Bu kelime zaten defterinde veya giriş yapman gerekiyor.");
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-display font-bold text-gray-700 mb-8 w-full text-left">Yeni Kelime Öğren</h2>
+      <div className="flex justify-between w-full items-center mb-8">
+        <h2 className="text-2xl font-display font-bold text-gray-700">Yeni Kelime Öğren</h2>
+        <button 
+          onClick={handleAddToNotebook}
+          className="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-dark transition-colors px-3 py-1.5 bg-primary/10 rounded-full"
+          disabled={addToNotebookMutation.isPending}
+        >
+          <PlusCircle className="w-4 h-4" />
+          Deftere Ekle
+        </button>
+      </div>
       
       <div 
         className="w-full max-w-sm aspect-square perspective-1000 cursor-pointer"
@@ -294,7 +367,13 @@ function WordExercise({ word, isFlipped, setIsFlipped }: { word: Word, isFlipped
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
         >
           {/* Front */}
-          <div className="absolute inset-0 backface-hidden bg-white border-2 border-border border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center">
+          <div className="absolute inset-0 backface-hidden bg-white border-2 border-border border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center relative group">
+            <button 
+              onClick={(e) => { e.stopPropagation(); speakWord(word.english); }}
+              className="absolute top-4 right-4 p-3 bg-secondary/10 text-secondary rounded-full hover:bg-secondary hover:text-white transition-colors"
+            >
+              <Volume2 className="w-6 h-6" />
+            </button>
             <span className="text-5xl font-display font-bold text-primary mb-4">{word.english}</span>
             <span className="text-xl text-gray-400 font-medium">[{word.pronunciation}]</span>
             <div className="absolute bottom-6 text-gray-300 font-bold text-sm uppercase tracking-wider flex items-center gap-2">
@@ -306,8 +385,16 @@ function WordExercise({ word, isFlipped, setIsFlipped }: { word: Word, isFlipped
           <div className="absolute inset-0 backface-hidden bg-secondary border-2 border-secondary-dark border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center" style={{ transform: "rotateY(180deg)" }}>
             <span className="text-4xl font-display font-bold text-white mb-6">{word.turkish}</span>
             <div className="bg-white/20 p-4 rounded-xl w-full">
-              <p className="text-white italic mb-2">"{word.example}"</p>
-              <p className="text-white/80 text-sm">"{word.exampleTurkish}"</p>
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-white italic text-left">"{word.example}"</p>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); speakWord(word.example); }}
+                  className="p-1.5 bg-white/20 text-white rounded-full hover:bg-white/40 transition-colors ml-2 shrink-0"
+                >
+                  <Volume2 className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-white/80 text-sm text-left">"{word.exampleTurkish}"</p>
             </div>
           </div>
         </motion.div>
@@ -332,7 +419,7 @@ function QuestionExercise({ question, selectedAnswer, setSelectedAnswer, status 
   useEffect(() => {
     if (isTranslation && question.options) {
       setWordBank(question.options);
-      setSelectedWords(selectedAnswer ? selectedAnswer.split(' ') : []);
+      setSelectedWords(selectedAnswer ? selectedAnswer.split(' ').filter(Boolean) : []);
     }
   }, [question, isTranslation]);
 

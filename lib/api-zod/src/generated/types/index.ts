@@ -3,16 +3,26 @@
  * Do not edit manually.
  * Api
  * Language Learning API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 
+export * from "./achievement";
+export * from "./addToNotebookRequest";
+export * from "./authUser";
 export * from "./completeLessonRequest";
+export * from "./exchangeMobileAuthorizationCodeBody";
+export * from "./exchangeMobileAuthorizationCodeResponse";
+export * from "./getCurrentAuthUserResponse";
 export * from "./healthStatus";
+export * from "./leaderboardEntry";
 export * from "./lesson";
 export * from "./lessonDetail";
 export * from "./lessonDifficulty";
+export * from "./logoutMobileSessionResponse";
+export * from "./notebookWord";
 export * from "./question";
 export * from "./questionType";
 export * from "./resetResult";
+export * from "./setDailyGoalRequest";
 export * from "./userProgress";
 export * from "./word";

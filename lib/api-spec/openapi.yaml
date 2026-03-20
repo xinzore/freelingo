@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Api
-  version: 0.1.0
+  version: 0.2.0
   description: Language Learning API
 servers:
   - url: /api
@@ -9,17 +9,24 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
   - name: lessons
     description: Lesson operations
   - name: progress
     description: User progress operations
+  - name: achievements
+    description: Achievement/badge operations
+  - name: notebook
+    description: Word notebook operations
+  - name: leaderboard
+    description: Leaderboard operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -27,6 +34,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current auth state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCurrentAuthUserResponse"
+  /mobile-auth/token-exchange:
+    post:
+      operationId: exchangeMobileAuthorizationCode
+      tags: [auth]
+      summary: Exchange mobile authorization code for session token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeBody"
+      responses:
+        "200":
+          description: Session token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeResponse"
+  /mobile-auth/logout:
+    post:
+      operationId: logoutMobileSession
+      tags: [auth]
+      summary: Logout mobile session
+      responses:
+        "200":
+          description: Logout result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutMobileSessionResponse"
   /lessons:
     get:
       operationId: getLessons
@@ -101,6 +150,101 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResetResult"
+  /progress/set-daily-goal:
+    post:
+      operationId: setDailyGoal
+      tags: [progress]
+      summary: Set daily XP goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetDailyGoalRequest"
+      responses:
+        "200":
+          description: Updated progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+  /achievements:
+    get:
+      operationId: getAchievements
+      tags: [achievements]
+      summary: Get all achievements with unlock status
+      responses:
+        "200":
+          description: List of achievements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+  /notebook:
+    get:
+      operationId: getNotebook
+      tags: [notebook]
+      summary: Get user word notebook
+      responses:
+        "200":
+          description: List of saved words
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotebookWord"
+    post:
+      operationId: addToNotebook
+      tags: [notebook]
+      summary: Add a word to notebook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddToNotebookRequest"
+      responses:
+        "200":
+          description: Added word
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotebookWord"
+  /notebook/{id}:
+    delete:
+      operationId: removeFromNotebook
+      tags: [notebook]
+      summary: Remove a word from notebook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetResult"
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Get top users by XP
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
 components:
   schemas:
     HealthStatus:
@@ -108,8 +252,60 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        profileImageUrl:
+          type: string
+          nullable: true
+      required: [id]
+    GetCurrentAuthUserResponse:
+      type: object
+      properties:
+        user:
+          oneOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
+      required: [user]
+    ExchangeMobileAuthorizationCodeBody:
+      type: object
+      properties:
+        code:
+          type: string
+        code_verifier:
+          type: string
+        redirect_uri:
+          type: string
+        state:
+          type: string
+        nonce:
+          type: string
+          nullable: true
+      required: [code, code_verifier, redirect_uri, state]
+    ExchangeMobileAuthorizationCodeResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required: [token]
+    LogoutMobileSessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]
     Lesson:
       type: object
       properties:
@@ -134,17 +330,7 @@ components:
           type: boolean
         icon:
           type: string
-      required:
-        - id
-        - title
-        - description
-        - category
-        - difficulty
-        - xpReward
-        - wordCount
-        - completed
-        - locked
-        - icon
+      required: [id, title, description, category, difficulty, xpReward, wordCount, completed, locked, icon]
     Word:
       type: object
       properties:
@@ -160,13 +346,7 @@ components:
           type: string
         exampleTurkish:
           type: string
-      required:
-        - id
-        - english
-        - turkish
-        - pronunciation
-        - example
-        - exampleTurkish
+      required: [id, english, turkish, pronunciation, example, exampleTurkish]
     Question:
       type: object
       properties:
@@ -185,11 +365,7 @@ components:
           type: string
         hint:
           type: string
-      required:
-        - id
-        - type
-        - question
-        - correctAnswer
+      required: [id, type, question, correctAnswer]
     LessonDetail:
       type: object
       properties:
@@ -213,15 +389,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Question"
-      required:
-        - id
-        - title
-        - description
-        - category
-        - difficulty
-        - xpReward
-        - words
-        - questions
+      required: [id, title, description, category, difficulty, xpReward, words, questions]
     UserProgress:
       type: object
       properties:
@@ -239,13 +407,13 @@ components:
           type: integer
         totalLessonsCompleted:
           type: integer
-      required:
-        - xp
-        - streak
-        - level
-        - completedLessons
-        - hearts
-        - totalLessonsCompleted
+        dailyGoalXp:
+          type: integer
+        dailyXpEarned:
+          type: integer
+        longestStreak:
+          type: integer
+      required: [xp, streak, level, completedLessons, hearts, totalLessonsCompleted, dailyGoalXp, dailyXpEarned, longestStreak]
     CompleteLessonRequest:
       type: object
       properties:
@@ -253,10 +421,13 @@ components:
           type: integer
         score:
           type: integer
-          description: Score percentage (0-100)
-      required:
-        - lessonId
-        - score
+      required: [lessonId, score]
+    SetDailyGoalRequest:
+      type: object
+      properties:
+        goalXp:
+          type: integer
+      required: [goalXp]
     ResetResult:
       type: object
       properties:
@@ -264,6 +435,88 @@ components:
           type: boolean
         message:
           type: string
-      required:
-        - success
-        - message
+      required: [success, message]
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        xpReward:
+          type: integer
+        unlocked:
+          type: boolean
+        unlockedAt:
+          type: string
+          nullable: true
+        condition:
+          type: string
+      required: [id, title, description, icon, xpReward, unlocked, condition]
+    NotebookWord:
+      type: object
+      properties:
+        id:
+          type: string
+        english:
+          type: string
+        turkish:
+          type: string
+        pronunciation:
+          type: string
+          nullable: true
+        example:
+          type: string
+          nullable: true
+        lessonId:
+          type: integer
+          nullable: true
+        addedAt:
+          type: string
+        reviewCount:
+          type: integer
+        known:
+          type: boolean
+      required: [id, english, turkish, reviewCount, known, addedAt]
+    AddToNotebookRequest:
+      type: object
+      properties:
+        english:
+          type: string
+        turkish:
+          type: string
+        pronunciation:
+          type: string
+          nullable: true
+        example:
+          type: string
+          nullable: true
+        lessonId:
+          type: integer
+          nullable: true
+      required: [english, turkish]
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        userId:
+          type: string
+        displayName:
+          type: string
+        xp:
+          type: integer
+        level:
+          type: integer
+        streak:
+          type: integer
+        profileImageUrl:
+          type: string
+          nullable: true
+        isCurrentUser:
+          type: boolean
+      required: [rank, userId, displayName, xp, level, streak, isCurrentUser]

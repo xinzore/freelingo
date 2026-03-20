@@ -3,10 +3,38 @@
  * Do not edit manually.
  * Api
  * Language Learning API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 export interface HealthStatus {
   status: string;
+}
+
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  profileImageUrl?: string | null;
+}
+
+export interface GetCurrentAuthUserResponse {
+  user: AuthUser | null;
+}
+
+export interface ExchangeMobileAuthorizationCodeBody {
+  code: string;
+  code_verifier: string;
+  redirect_uri: string;
+  state: string;
+  nonce?: string | null;
+}
+
+export interface ExchangeMobileAuthorizationCodeResponse {
+  token: string;
+}
+
+export interface LogoutMobileSessionResponse {
+  success: boolean;
 }
 
 export type LessonDifficulty =
@@ -76,15 +104,63 @@ export interface UserProgress {
   completedLessons: number[];
   hearts: number;
   totalLessonsCompleted: number;
+  dailyGoalXp: number;
+  dailyXpEarned: number;
+  longestStreak: number;
 }
 
 export interface CompleteLessonRequest {
   lessonId: number;
-  /** Score percentage (0-100) */
   score: number;
+}
+
+export interface SetDailyGoalRequest {
+  goalXp: number;
 }
 
 export interface ResetResult {
   success: boolean;
   message: string;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  xpReward: number;
+  unlocked: boolean;
+  unlockedAt?: string | null;
+  condition: string;
+}
+
+export interface NotebookWord {
+  id: string;
+  english: string;
+  turkish: string;
+  pronunciation?: string | null;
+  example?: string | null;
+  lessonId?: number | null;
+  addedAt: string;
+  reviewCount: number;
+  known: boolean;
+}
+
+export interface AddToNotebookRequest {
+  english: string;
+  turkish: string;
+  pronunciation?: string | null;
+  example?: string | null;
+  lessonId?: number | null;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  userId: string;
+  displayName: string;
+  xp: number;
+  level: number;
+  streak: number;
+  profileImageUrl?: string | null;
+  isCurrentUser: boolean;
 }

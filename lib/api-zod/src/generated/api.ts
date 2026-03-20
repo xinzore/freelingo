@@ -3,16 +3,53 @@
  * Do not edit manually.
  * Api
  * Language Learning API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
+});
+
+/**
+ * @summary Get current authenticated user
+ */
+export const GetCurrentAuthUserResponse = zod.object({
+  user: zod.union([
+    zod.object({
+      id: zod.string(),
+      email: zod.string().nullish(),
+      firstName: zod.string().nullish(),
+      lastName: zod.string().nullish(),
+      profileImageUrl: zod.string().nullish(),
+    }),
+    zod.null(),
+  ]),
+});
+
+/**
+ * @summary Exchange mobile authorization code for session token
+ */
+export const ExchangeMobileAuthorizationCodeBody = zod.object({
+  code: zod.string(),
+  code_verifier: zod.string(),
+  redirect_uri: zod.string(),
+  state: zod.string(),
+  nonce: zod.string().nullish(),
+});
+
+export const ExchangeMobileAuthorizationCodeResponse = zod.object({
+  token: zod.string(),
+});
+
+/**
+ * @summary Logout mobile session
+ */
+export const LogoutMobileSessionResponse = zod.object({
+  success: zod.boolean(),
 });
 
 /**
@@ -83,6 +120,9 @@ export const GetProgressResponse = zod.object({
   completedLessons: zod.array(zod.number()),
   hearts: zod.number(),
   totalLessonsCompleted: zod.number(),
+  dailyGoalXp: zod.number(),
+  dailyXpEarned: zod.number(),
+  longestStreak: zod.number(),
 });
 
 /**
@@ -90,7 +130,7 @@ export const GetProgressResponse = zod.object({
  */
 export const CompleteLessonBody = zod.object({
   lessonId: zod.number(),
-  score: zod.number().describe("Score percentage (0-100)"),
+  score: zod.number(),
 });
 
 export const CompleteLessonResponse = zod.object({
@@ -100,6 +140,9 @@ export const CompleteLessonResponse = zod.object({
   completedLessons: zod.array(zod.number()),
   hearts: zod.number(),
   totalLessonsCompleted: zod.number(),
+  dailyGoalXp: zod.number(),
+  dailyXpEarned: zod.number(),
+  longestStreak: zod.number(),
 });
 
 /**
@@ -109,3 +152,103 @@ export const ResetProgressResponse = zod.object({
   success: zod.boolean(),
   message: zod.string(),
 });
+
+/**
+ * @summary Set daily XP goal
+ */
+export const SetDailyGoalBody = zod.object({
+  goalXp: zod.number(),
+});
+
+export const SetDailyGoalResponse = zod.object({
+  xp: zod.number(),
+  streak: zod.number(),
+  level: zod.number(),
+  completedLessons: zod.array(zod.number()),
+  hearts: zod.number(),
+  totalLessonsCompleted: zod.number(),
+  dailyGoalXp: zod.number(),
+  dailyXpEarned: zod.number(),
+  longestStreak: zod.number(),
+});
+
+/**
+ * @summary Get all achievements with unlock status
+ */
+export const GetAchievementsResponseItem = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  description: zod.string(),
+  icon: zod.string(),
+  xpReward: zod.number(),
+  unlocked: zod.boolean(),
+  unlockedAt: zod.string().nullish(),
+  condition: zod.string(),
+});
+export const GetAchievementsResponse = zod.array(GetAchievementsResponseItem);
+
+/**
+ * @summary Get user word notebook
+ */
+export const GetNotebookResponseItem = zod.object({
+  id: zod.string(),
+  english: zod.string(),
+  turkish: zod.string(),
+  pronunciation: zod.string().nullish(),
+  example: zod.string().nullish(),
+  lessonId: zod.number().nullish(),
+  addedAt: zod.string(),
+  reviewCount: zod.number(),
+  known: zod.boolean(),
+});
+export const GetNotebookResponse = zod.array(GetNotebookResponseItem);
+
+/**
+ * @summary Add a word to notebook
+ */
+export const AddToNotebookBody = zod.object({
+  english: zod.string(),
+  turkish: zod.string(),
+  pronunciation: zod.string().nullish(),
+  example: zod.string().nullish(),
+  lessonId: zod.number().nullish(),
+});
+
+export const AddToNotebookResponse = zod.object({
+  id: zod.string(),
+  english: zod.string(),
+  turkish: zod.string(),
+  pronunciation: zod.string().nullish(),
+  example: zod.string().nullish(),
+  lessonId: zod.number().nullish(),
+  addedAt: zod.string(),
+  reviewCount: zod.number(),
+  known: zod.boolean(),
+});
+
+/**
+ * @summary Remove a word from notebook
+ */
+export const RemoveFromNotebookParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const RemoveFromNotebookResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Get top users by XP
+ */
+export const GetLeaderboardResponseItem = zod.object({
+  rank: zod.number(),
+  userId: zod.string(),
+  displayName: zod.string(),
+  xp: zod.number(),
+  level: zod.number(),
+  streak: zod.number(),
+  profileImageUrl: zod.string().nullish(),
+  isCurrentUser: zod.boolean(),
+});
+export const GetLeaderboardResponse = zod.array(GetLeaderboardResponseItem);

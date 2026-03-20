@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface CompleteLessonRequest {
-  lessonId: number;
-  score: number;
+export interface ExchangeMobileAuthorizationCodeResponse {
+  token: string;
 }

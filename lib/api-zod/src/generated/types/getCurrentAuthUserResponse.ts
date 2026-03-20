@@ -5,8 +5,8 @@
  * Language Learning API
  * OpenAPI spec version: 0.2.0
  */
+import type { AuthUser } from "./authUser";
 
-export interface CompleteLessonRequest {
-  lessonId: number;
-  score: number;
+export interface GetCurrentAuthUserResponse {
+  user: AuthUser | null;
 }
