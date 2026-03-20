@@ -1,0 +1,24 @@
+packages:
+  "framer-motion": "For playful, gamified animations like card flips, bouncing feedback, and progress bars."
+  "canvas-confetti": "For celebration effects when a user completes a lesson."
+  "@types/canvas-confetti": "Types for canvas-confetti."
+  "clsx": "For conditional class merging."
+  "tailwind-merge": "For merging tailwind classes in reusable components."
+
+images:
+  - path: "artifacts/dil-ogrenme/public/images/mascot-happy.png"
+    description: "A 3D stylized, cute, playful green owl or bird character smiling and cheering, transparent background, gamified style"
+    aspect_ratio: "1:1"
+  - path: "artifacts/dil-ogrenme/public/images/mascot-sad.png"
+    description: "A 3D stylized, cute, playful green owl or bird character looking sad or confused, transparent background, gamified style"
+    aspect_ratio: "1:1"
+  - path: "artifacts/dil-ogrenme/public/images/streak-flame.png"
+    description: "A 3D stylized, glowing orange and yellow fire flame icon, gamified style, transparent background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/dil-ogrenme/public/images/chest-open.png"
+    description: "A 3D stylized, glowing treasure chest overflowing with gold coins and gems, gamified style, transparent background"
+    aspect_ratio: "1:1"
+
+notes:
+  - "Assuming @workspace/api-client-react provides useGetLessons, useGetLesson, useGetProgress, useCompleteLesson, useResetProgress hooks based on the OpenAPI specs."
+  - "The UI will use a mobile-first gamified approach resembling Duolingo."

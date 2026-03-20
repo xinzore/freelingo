@@ -1,15 +1,18 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Language Learning API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: lessons
+    description: Lesson operations
+  - name: progress
+    description: User progress operations
 paths:
   /healthz:
     get:
@@ -24,6 +27,80 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /lessons:
+    get:
+      operationId: getLessons
+      tags: [lessons]
+      summary: Get all lessons
+      responses:
+        "200":
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+  /lessons/{id}:
+    get:
+      operationId: getLesson
+      tags: [lessons]
+      summary: Get a specific lesson
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lesson details with words and questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonDetail"
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [progress]
+      summary: Get user progress
+      responses:
+        "200":
+          description: User progress info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+  /progress/complete-lesson:
+    post:
+      operationId: completeLesson
+      tags: [progress]
+      summary: Mark a lesson as complete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteLessonRequest"
+      responses:
+        "200":
+          description: Updated progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+  /progress/reset:
+    post:
+      operationId: resetProgress
+      tags: [progress]
+      summary: Reset all progress
+      responses:
+        "200":
+          description: Reset result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetResult"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +110,160 @@ components:
           type: string
       required:
         - status
-
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        xpReward:
+          type: integer
+        wordCount:
+          type: integer
+        completed:
+          type: boolean
+        locked:
+          type: boolean
+        icon:
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - category
+        - difficulty
+        - xpReward
+        - wordCount
+        - completed
+        - locked
+        - icon
+    Word:
+      type: object
+      properties:
+        id:
+          type: integer
+        english:
+          type: string
+        turkish:
+          type: string
+        pronunciation:
+          type: string
+        example:
+          type: string
+        exampleTurkish:
+          type: string
+      required:
+        - id
+        - english
+        - turkish
+        - pronunciation
+        - example
+        - exampleTurkish
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [translate-to-english, translate-to-turkish, multiple-choice, fill-blank]
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        correctAnswer:
+          type: string
+        hint:
+          type: string
+      required:
+        - id
+        - type
+        - question
+        - correctAnswer
+    LessonDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+        xpReward:
+          type: integer
+        words:
+          type: array
+          items:
+            $ref: "#/components/schemas/Word"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+      required:
+        - id
+        - title
+        - description
+        - category
+        - difficulty
+        - xpReward
+        - words
+        - questions
+    UserProgress:
+      type: object
+      properties:
+        xp:
+          type: integer
+        streak:
+          type: integer
+        level:
+          type: integer
+        completedLessons:
+          type: array
+          items:
+            type: integer
+        hearts:
+          type: integer
+        totalLessonsCompleted:
+          type: integer
+      required:
+        - xp
+        - streak
+        - level
+        - completedLessons
+        - hearts
+        - totalLessonsCompleted
+    CompleteLessonRequest:
+      type: object
+      properties:
+        lessonId:
+          type: integer
+        score:
+          type: integer
+          description: Score percentage (0-100)
+      required:
+        - lessonId
+        - score
+    ResetResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message

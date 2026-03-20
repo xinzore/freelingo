@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: 'Nunito', sans-serif;
+  --font-display: 'Fredoka', sans-serif;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-dark: hsl(var(--primary-dark));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-dark: hsl(var(--secondary-dark));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-dark: hsl(var(--destructive-dark));
+
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-dark: hsl(var(--success-dark));
+  
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-warning-dark: hsl(var(--warning-dark));
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 104 98% 40%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  /* Gamified Primary (Duolingo Green) */
+  --primary: 104 98% 40%;
+  --primary-foreground: 0 0% 100%;
+  --primary-dark: 104 98% 30%;
+
+  /* Secondary (Sky Blue) */
+  --secondary: 199 89% 48%;
+  --secondary-foreground: 0 0% 100%;
+  --secondary-dark: 199 89% 38%;
+
+  /* Muted / Neutral */
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  /* Accent (Purple) */
+  --accent: 262 83% 58%;
+  --accent-foreground: 0 0% 100%;
+
+  /* Destructive (Red) */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-dark: 0 84% 50%;
+
+  /* Success (Bright Green for correct answers) */
+  --success: 104 98% 40%;
+  --success-foreground: 0 0% 100%;
+  --success-dark: 104 98% 30%;
+
+  /* Warning (Orange for streak/fire) */
+  --warning: 35 100% 55%;
+  --warning-foreground: 0 0% 100%;
+  --warning-dark: 35 100% 45%;
+
+  --radius: 1rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-sans overflow-x-hidden;
+    /* Soft pattern for background */
+    background-image: radial-gradient(hsl(var(--muted-foreground) / 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply tracking-wide text-gray-800;
+  }
+}
+
+/* Scrollbar styling for horizontal lists */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Fancy bottom border transition for gamified look */
+.gamified-active-effect:active {
+  transform: translateY(4px);
+  border-bottom-width: 0px !important;
+  margin-top: 4px;
+}
