@@ -11,6 +11,7 @@ const router: IRouter = Router();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = "DuoTR <onboarding@resend.dev>";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 function getOrigin(req: Request): string {
   const proto = req.headers["x-forwarded-proto"] || "https";
@@ -84,19 +85,42 @@ router.post("/auth/register", async (req: Request, res: Response) => {
     userId = newUser.id;
   }
 
-  await db.insert(emailAuthTable).values({
-    userId,
-    passwordHash,
-    isVerified: false,
-    verificationToken,
-    verificationTokenExpires,
-  });
-
   const origin = getOrigin(req);
   const verifyUrl = `${origin}/api/auth/verify-email?token=${verificationToken}`;
 
+  // In development: auto-verify to avoid email dependency during testing
+  const autoVerify = !IS_PRODUCTION;
+
+  await db.insert(emailAuthTable).values({
+    userId,
+    passwordHash,
+    isVerified: autoVerify,
+    verificationToken: autoVerify ? null : verificationToken,
+    verificationTokenExpires: autoVerify ? null : verificationTokenExpires,
+  });
+
+  if (autoVerify) {
+    // Dev mode: create session immediately, no email needed
+    console.log(`[DEV] Auto-verified user: ${email}`);
+    const sessionData = {
+      user: {
+        id: userId,
+        email: email.toLowerCase(),
+        firstName,
+        lastName,
+        profileImageUrl: null,
+      },
+      access_token: "email-auth",
+    };
+    const sid = await createSession(sessionData);
+    setSessionCookie(res, sid);
+    res.json({ success: true, message: "Kayıt başarılı! Hoş geldin!" });
+    return;
+  }
+
+  // Production: send verification email
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: "DuoTR - E-posta Adresini Doğrula",
@@ -121,8 +145,11 @@ router.post("/auth/register", async (req: Request, res: Response) => {
         </div>
       `,
     });
+    if (result.error) {
+      console.error("[Resend] Email send error:", result.error);
+    }
   } catch (err) {
-    req.log?.error?.({ err }, "Failed to send verification email");
+    console.error("[Resend] Exception sending verification email:", err);
   }
 
   res.json({ success: true, message: "Kayıt başarılı! Lütfen e-posta adresini doğrula." });

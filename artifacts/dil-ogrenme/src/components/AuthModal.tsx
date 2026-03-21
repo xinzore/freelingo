@@ -106,9 +106,13 @@ export function AuthModal({ open, onClose, initialView = "choice", resetToken }:
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Kayıt başarısız.");
-      } else {
+      } else if (data.message?.includes("doğrula")) {
+        // Production: needs email verification
         setView("verify-sent");
         resetForm();
+      } else {
+        // Dev mode: auto-verified, session cookie set — reload
+        window.location.reload();
       }
     } catch {
       setError("Bağlantı hatası. Tekrar deneyin.");
