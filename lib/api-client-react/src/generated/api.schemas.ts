@@ -154,6 +154,35 @@ export interface AddToNotebookRequest {
   lessonId?: number | null;
 }
 
+export interface EmailRegisterRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface EmailLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
+
+export interface AuthActionResult {
+  success: boolean;
+  message: string;
+}
+
+export interface AuthError {
+  error: string;
+}
+
 export interface LeaderboardEntry {
   rank: number;
   userId: string;
@@ -164,3 +193,7 @@ export interface LeaderboardEntry {
   profileImageUrl?: string | null;
   isCurrentUser: boolean;
 }
+
+export type VerifyEmailParams = {
+  token: string;
+};

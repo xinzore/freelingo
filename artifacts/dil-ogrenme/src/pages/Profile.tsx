@@ -6,11 +6,15 @@ import { Flame, Diamond, BookOpen, Award, Target, LogOut, AlertTriangle, User as
 import { useAuth } from "@workspace/replit-auth-web";
 import { cn } from "@/lib/utils";
 
-export function Profile() {
+interface ProfileProps {
+  onOpenAuth?: () => void;
+}
+
+export function Profile({ onOpenAuth }: ProfileProps) {
   const { data: progress, refetch } = useGetProgress();
   const resetMutation = useResetProgress();
   const setDailyGoalMutation = useSetDailyGoal();
-  const { user, isAuthenticated, login, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const handleReset = async () => {
     if (confirm("Tüm ilerlemeni sıfırlamak istediğine emin misin? Bu işlem geri alınamaz!")) {
@@ -20,7 +24,7 @@ export function Profile() {
   };
 
   const handleSetGoal = async (goal: number) => {
-    if (!isAuthenticated) return login();
+    if (!isAuthenticated) { onOpenAuth?.(); return; }
     await setDailyGoalMutation.mutateAsync({
       data: { dailyGoal: goal }
     });
@@ -29,7 +33,7 @@ export function Profile() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
-      <TopBar />
+      <TopBar onOpenAuth={onOpenAuth} />
       
       <main className="max-w-md mx-auto pt-8 px-4 flex flex-col items-center">
         
@@ -48,7 +52,7 @@ export function Profile() {
           <p className="text-gray-500 font-medium mt-1">Seviye {progress?.level || 1}</p>
           
           {!isAuthenticated && (
-            <GamifiedButton className="mt-4 px-8" onClick={login}>
+            <GamifiedButton className="mt-4 px-8" onClick={onOpenAuth}>
               Giriş Yap
             </GamifiedButton>
           )}

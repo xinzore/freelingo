@@ -8,10 +8,15 @@
 
 export * from "./achievement";
 export * from "./addToNotebookRequest";
+export * from "./authActionResult";
+export * from "./authError";
 export * from "./authUser";
 export * from "./completeLessonRequest";
+export * from "./emailLoginRequest";
+export * from "./emailRegisterRequest";
 export * from "./exchangeMobileAuthorizationCodeBody";
 export * from "./exchangeMobileAuthorizationCodeResponse";
+export * from "./forgotPasswordRequest";
 export * from "./getCurrentAuthUserResponse";
 export * from "./healthStatus";
 export * from "./leaderboardEntry";
@@ -22,7 +27,9 @@ export * from "./logoutMobileSessionResponse";
 export * from "./notebookWord";
 export * from "./question";
 export * from "./questionType";
+export * from "./resetPasswordRequest";
 export * from "./resetResult";
 export * from "./setDailyGoalRequest";
 export * from "./userProgress";
+export * from "./verifyEmailParams";
 export * from "./word";

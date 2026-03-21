@@ -5,10 +5,14 @@ import { GamifiedButton } from "@/components/ui/gamified-button";
 import { Volume2, Trash2, BookX } from "lucide-react";
 import { useAuth } from "@workspace/replit-auth-web";
 
-export function Notebook() {
+interface NotebookProps {
+  onOpenAuth?: () => void;
+}
+
+export function Notebook({ onOpenAuth }: NotebookProps) {
   const { data: notebookWords, isLoading, refetch } = useGetNotebook();
   const removeMutation = useRemoveFromNotebook();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const speakWord = (text: string) => {
     if ('speechSynthesis' in window) {
@@ -26,7 +30,7 @@ export function Notebook() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
-      <TopBar />
+      <TopBar onOpenAuth={onOpenAuth} />
       
       <main className="max-w-md mx-auto pt-8 px-4 flex flex-col items-center">
         <h1 className="w-full text-3xl font-display font-bold text-gray-800 mb-6">Kelime Defterim</h1>
@@ -38,7 +42,7 @@ export function Notebook() {
             <p className="text-gray-500 mb-6 font-medium">
               Öğrendiğin kelimeleri kaydetmek ve tekrar etmek için giriş yapmalısın.
             </p>
-            <GamifiedButton onClick={login} className="px-8">
+            <GamifiedButton onClick={onOpenAuth} className="px-8">
               Giriş Yap
             </GamifiedButton>
           </div>

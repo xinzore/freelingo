@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@workspace/replit-auth-web";
+import { AuthModal } from "@/components/AuthModal";
 
 // Pages
 import { Home } from "@/pages/Home";
@@ -22,30 +25,71 @@ const queryClient = new QueryClient({
   },
 });
 
-function Router() {
+function AppInner() {
+  const { toast } = useToast();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [resetToken, setResetToken] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const verified = params.get("verified");
+    if (verified) {
+      if (verified === "success") {
+        toast({ title: "✅ E-posta doğrulandı!", description: "Artık giriş yapabilirsin." });
+        setAuthModalOpen(true);
+      } else if (verified === "expired") {
+        toast({ title: "⚠️ Bağlantının süresi dolmuş", description: "Yeniden kayıt olmayı dene.", variant: "destructive" });
+      } else {
+        toast({ title: "❌ Geçersiz bağlantı", description: "Doğrulama başarısız.", variant: "destructive" });
+      }
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete("verified");
+      window.history.replaceState({}, "", clean.toString());
+    }
+
+    const token = params.get("reset-token");
+    if (token) {
+      setResetToken(token);
+      setAuthModalOpen(true);
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete("reset-token");
+      window.history.replaceState({}, "", clean.toString());
+    }
+  }, []);
+
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/lesson/:id" component={Lesson} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/achievements" component={Achievements} />
-      <Route path="/notebook" component={Notebook} />
-      <Route path="/leaderboard" component={Leaderboard} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <Switch>
+          <Route path="/" component={() => <Home onOpenAuth={() => setAuthModalOpen(true)} />} />
+          <Route path="/lesson/:id" component={Lesson} />
+          <Route path="/profile" component={() => <Profile onOpenAuth={() => setAuthModalOpen(true)} />} />
+          <Route path="/achievements" component={Achievements} />
+          <Route path="/notebook" component={() => <Notebook onOpenAuth={() => setAuthModalOpen(true)} />} />
+          <Route path="/leaderboard" component={Leaderboard} />
+          <Route component={NotFound} />
+        </Switch>
+      </WouterRouter>
+
+      <AuthModal
+        open={authModalOpen}
+        onClose={() => { setAuthModalOpen(false); setResetToken(undefined); }}
+        resetToken={resetToken}
+      />
+
+      <Toaster />
+    </>
   );
 }
 
 function App() {
-  const auth = useAuth();
-  
+  useAuth();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
+        <AppInner />
       </TooltipProvider>
     </QueryClientProvider>
   );

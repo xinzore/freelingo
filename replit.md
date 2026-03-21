@@ -55,6 +55,17 @@ A Duolingo-like English learning app for Turkish speakers. Mobile-first, respons
 - **Dark mode** toggle
 - Bottom navigation: Dersler, Ligler, Rozetler, Defter, Profil
 
+### Authentication Methods
+- **Replit Auth** — OAuth via Replit (OpenID Connect/PKCE)
+- **E-posta/Şifre** — Custom email+password with Resend verification emails
+  - Register: POST /api/auth/register (sends verification email via Resend)
+  - Login: POST /api/auth/login-email (checks verified status)
+  - Verify: GET /api/auth/verify-email?token=... (redirects to /?verified=success)
+  - Forgot: POST /api/auth/forgot-password (sends reset email)
+  - Reset: POST /api/auth/reset-password (with token + new password)
+- Both methods use the same session mechanism (cookie-based, stored in `sessions` DB table)
+- `email_auth` table stores password hash, verification token, reset token
+
 ### API Endpoints
 - GET /api/lessons - list all lessons
 - GET /api/lessons/:id - lesson detail with words + questions

@@ -4,9 +4,13 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { GamifiedButton } from "@/components/ui/gamified-button";
 
-export function TopBar() {
+interface TopBarProps {
+  onOpenAuth?: () => void;
+}
+
+export function TopBar({ onOpenAuth }: TopBarProps) {
   const { data: progress } = useGetProgress();
-  const { user, isAuthenticated, login } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
   return (
@@ -34,7 +38,7 @@ export function TopBar() {
         <div className="w-px h-6 bg-border mx-1"></div>
 
         {!isAuthenticated ? (
-          <GamifiedButton size="sm" onClick={login} className="px-3 py-1 text-sm">
+          <GamifiedButton size="sm" onClick={onOpenAuth} className="px-3 py-1 text-sm">
             Giriş Yap
           </GamifiedButton>
         ) : (

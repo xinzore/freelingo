@@ -7,7 +7,11 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ProgressBar } from "@/components/ui/progress-bar";
 
-export function Home() {
+interface HomeProps {
+  onOpenAuth?: () => void;
+}
+
+export function Home({ onOpenAuth }: HomeProps) {
   const { data: lessons, isLoading: lessonsLoading } = useGetLessons();
   const { data: progress } = useGetProgress();
 
@@ -30,7 +34,7 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
-      <TopBar />
+      <TopBar onOpenAuth={onOpenAuth} />
       
       <main className="max-w-md mx-auto pt-6 px-4 flex flex-col items-center">
         {/* Daily Goal Card */}

@@ -19,9 +19,14 @@ import type {
 import type {
   Achievement,
   AddToNotebookRequest,
+  AuthActionResult,
+  AuthError,
   CompleteLessonRequest,
+  EmailLoginRequest,
+  EmailRegisterRequest,
   ExchangeMobileAuthorizationCodeBody,
   ExchangeMobileAuthorizationCodeResponse,
+  ForgotPasswordRequest,
   GetCurrentAuthUserResponse,
   HealthStatus,
   LeaderboardEntry,
@@ -29,9 +34,11 @@ import type {
   LessonDetail,
   LogoutMobileSessionResponse,
   NotebookWord,
+  ResetPasswordRequest,
   ResetResult,
   SetDailyGoalRequest,
   UserProgress,
+  VerifyEmailParams,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -364,6 +371,444 @@ export const useLogoutMobileSession = <
   TContext
 > => {
   return useMutation(getLogoutMobileSessionMutationOptions(options));
+};
+
+/**
+ * @summary Register with email and password
+ */
+export const getRegisterWithEmailUrl = () => {
+  return `/api/auth/register`;
+};
+
+export const registerWithEmail = async (
+  emailRegisterRequest: EmailRegisterRequest,
+  options?: RequestInit,
+): Promise<AuthActionResult> => {
+  return customFetch<AuthActionResult>(getRegisterWithEmailUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(emailRegisterRequest),
+  });
+};
+
+export const getRegisterWithEmailMutationOptions = <
+  TError = ErrorType<AuthError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerWithEmail>>,
+    TError,
+    { data: BodyType<EmailRegisterRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof registerWithEmail>>,
+  TError,
+  { data: BodyType<EmailRegisterRequest> },
+  TContext
+> => {
+  const mutationKey = ["registerWithEmail"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof registerWithEmail>>,
+    { data: BodyType<EmailRegisterRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return registerWithEmail(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RegisterWithEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof registerWithEmail>>
+>;
+export type RegisterWithEmailMutationBody = BodyType<EmailRegisterRequest>;
+export type RegisterWithEmailMutationError = ErrorType<AuthError>;
+
+/**
+ * @summary Register with email and password
+ */
+export const useRegisterWithEmail = <
+  TError = ErrorType<AuthError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerWithEmail>>,
+    TError,
+    { data: BodyType<EmailRegisterRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof registerWithEmail>>,
+  TError,
+  { data: BodyType<EmailRegisterRequest> },
+  TContext
+> => {
+  return useMutation(getRegisterWithEmailMutationOptions(options));
+};
+
+/**
+ * @summary Login with email and password
+ */
+export const getLoginWithEmailUrl = () => {
+  return `/api/auth/login-email`;
+};
+
+export const loginWithEmail = async (
+  emailLoginRequest: EmailLoginRequest,
+  options?: RequestInit,
+): Promise<AuthActionResult> => {
+  return customFetch<AuthActionResult>(getLoginWithEmailUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(emailLoginRequest),
+  });
+};
+
+export const getLoginWithEmailMutationOptions = <
+  TError = ErrorType<AuthError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof loginWithEmail>>,
+    TError,
+    { data: BodyType<EmailLoginRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof loginWithEmail>>,
+  TError,
+  { data: BodyType<EmailLoginRequest> },
+  TContext
+> => {
+  const mutationKey = ["loginWithEmail"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof loginWithEmail>>,
+    { data: BodyType<EmailLoginRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return loginWithEmail(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LoginWithEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof loginWithEmail>>
+>;
+export type LoginWithEmailMutationBody = BodyType<EmailLoginRequest>;
+export type LoginWithEmailMutationError = ErrorType<AuthError>;
+
+/**
+ * @summary Login with email and password
+ */
+export const useLoginWithEmail = <
+  TError = ErrorType<AuthError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof loginWithEmail>>,
+    TError,
+    { data: BodyType<EmailLoginRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof loginWithEmail>>,
+  TError,
+  { data: BodyType<EmailLoginRequest> },
+  TContext
+> => {
+  return useMutation(getLoginWithEmailMutationOptions(options));
+};
+
+/**
+ * @summary Verify email address via token
+ */
+export const getVerifyEmailUrl = (params: VerifyEmailParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/auth/verify-email?${stringifiedParams}`
+    : `/api/auth/verify-email`;
+};
+
+export const verifyEmail = async (
+  params: VerifyEmailParams,
+  options?: RequestInit,
+): Promise<AuthActionResult> => {
+  return customFetch<AuthActionResult>(getVerifyEmailUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getVerifyEmailQueryKey = (params?: VerifyEmailParams) => {
+  return [`/api/auth/verify-email`, ...(params ? [params] : [])] as const;
+};
+
+export const getVerifyEmailQueryOptions = <
+  TData = Awaited<ReturnType<typeof verifyEmail>>,
+  TError = ErrorType<unknown>,
+>(
+  params: VerifyEmailParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof verifyEmail>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getVerifyEmailQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof verifyEmail>>> = ({
+    signal,
+  }) => verifyEmail(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof verifyEmail>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type VerifyEmailQueryResult = NonNullable<
+  Awaited<ReturnType<typeof verifyEmail>>
+>;
+export type VerifyEmailQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Verify email address via token
+ */
+
+export function useVerifyEmail<
+  TData = Awaited<ReturnType<typeof verifyEmail>>,
+  TError = ErrorType<unknown>,
+>(
+  params: VerifyEmailParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof verifyEmail>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getVerifyEmailQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Request password reset email
+ */
+export const getForgotPasswordUrl = () => {
+  return `/api/auth/forgot-password`;
+};
+
+export const forgotPassword = async (
+  forgotPasswordRequest: ForgotPasswordRequest,
+  options?: RequestInit,
+): Promise<AuthActionResult> => {
+  return customFetch<AuthActionResult>(getForgotPasswordUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(forgotPasswordRequest),
+  });
+};
+
+export const getForgotPasswordMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof forgotPassword>>,
+    TError,
+    { data: BodyType<ForgotPasswordRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof forgotPassword>>,
+  TError,
+  { data: BodyType<ForgotPasswordRequest> },
+  TContext
+> => {
+  const mutationKey = ["forgotPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof forgotPassword>>,
+    { data: BodyType<ForgotPasswordRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return forgotPassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ForgotPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof forgotPassword>>
+>;
+export type ForgotPasswordMutationBody = BodyType<ForgotPasswordRequest>;
+export type ForgotPasswordMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Request password reset email
+ */
+export const useForgotPassword = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof forgotPassword>>,
+    TError,
+    { data: BodyType<ForgotPasswordRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof forgotPassword>>,
+  TError,
+  { data: BodyType<ForgotPasswordRequest> },
+  TContext
+> => {
+  return useMutation(getForgotPasswordMutationOptions(options));
+};
+
+/**
+ * @summary Reset password with token
+ */
+export const getResetPasswordUrl = () => {
+  return `/api/auth/reset-password`;
+};
+
+export const resetPassword = async (
+  resetPasswordRequest: ResetPasswordRequest,
+  options?: RequestInit,
+): Promise<AuthActionResult> => {
+  return customFetch<AuthActionResult>(getResetPasswordUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(resetPasswordRequest),
+  });
+};
+
+export const getResetPasswordMutationOptions = <
+  TError = ErrorType<AuthError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetPassword>>,
+    TError,
+    { data: BodyType<ResetPasswordRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resetPassword>>,
+  TError,
+  { data: BodyType<ResetPasswordRequest> },
+  TContext
+> => {
+  const mutationKey = ["resetPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resetPassword>>,
+    { data: BodyType<ResetPasswordRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return resetPassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResetPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resetPassword>>
+>;
+export type ResetPasswordMutationBody = BodyType<ResetPasswordRequest>;
+export type ResetPasswordMutationError = ErrorType<AuthError>;
+
+/**
+ * @summary Reset password with token
+ */
+export const useResetPassword = <
+  TError = ErrorType<AuthError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetPassword>>,
+    TError,
+    { data: BodyType<ResetPasswordRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof resetPassword>>,
+  TError,
+  { data: BodyType<ResetPasswordRequest> },
+  TContext
+> => {
+  return useMutation(getResetPasswordMutationOptions(options));
 };
 
 /**

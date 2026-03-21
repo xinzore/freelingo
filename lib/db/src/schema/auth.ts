@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const sessionsTable = pgTable(
@@ -25,3 +25,18 @@ export const usersTable = pgTable("users", {
 
 export type UpsertUser = typeof usersTable.$inferInsert;
 export type User = typeof usersTable.$inferSelect;
+
+export const emailAuthTable = pgTable("email_auth", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().unique().references(() => usersTable.id, { onDelete: "cascade" }),
+  passwordHash: varchar("password_hash").notNull(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  verificationToken: varchar("verification_token"),
+  verificationTokenExpires: timestamp("verification_token_expires", { withTimezone: true }),
+  resetToken: varchar("reset_token"),
+  resetTokenExpires: timestamp("reset_token_expires", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type EmailAuth = typeof emailAuthTable.$inferSelect;
+export type InsertEmailAuth = typeof emailAuthTable.$inferInsert;

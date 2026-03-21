@@ -53,6 +53,70 @@ export const LogoutMobileSessionResponse = zod.object({
 });
 
 /**
+ * @summary Register with email and password
+ */
+export const RegisterWithEmailBody = zod.object({
+  email: zod.string(),
+  password: zod.string(),
+  name: zod.string(),
+});
+
+export const RegisterWithEmailResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Login with email and password
+ */
+export const LoginWithEmailBody = zod.object({
+  email: zod.string(),
+  password: zod.string(),
+});
+
+export const LoginWithEmailResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Verify email address via token
+ */
+export const VerifyEmailQueryParams = zod.object({
+  token: zod.coerce.string(),
+});
+
+export const VerifyEmailResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Request password reset email
+ */
+export const ForgotPasswordBody = zod.object({
+  email: zod.string(),
+});
+
+export const ForgotPasswordResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
+ * @summary Reset password with token
+ */
+export const ResetPasswordBody = zod.object({
+  token: zod.string(),
+  password: zod.string(),
+});
+
+export const ResetPasswordResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string(),
+});
+
+/**
  * @summary Get all lessons
  */
 export const GetLessonsResponseItem = zod.object({
