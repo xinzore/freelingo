@@ -358,16 +358,21 @@ function WordExercise({ word, isFlipped, setIsFlipped }: { word: Word, isFlipped
       </div>
       
       <div 
-        className="w-full max-w-sm aspect-square perspective-1000 cursor-pointer"
+        className="w-full max-w-sm aspect-square cursor-pointer"
+        style={{ perspective: "1000px" }}
         onClick={() => setIsFlipped(!isFlipped)}
       >
         <motion.div 
-          className="w-full h-full relative preserve-3d"
+          className="w-full h-full relative"
+          style={{ transformStyle: "preserve-3d" }}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
         >
           {/* Front */}
-          <div className="absolute inset-0 backface-hidden bg-white border-2 border-border border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center relative group">
+          <div 
+            className="absolute inset-0 bg-white border-2 border-border border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center"
+            style={{ backfaceVisibility: "hidden" }}
+          >
             <button 
               onClick={(e) => { e.stopPropagation(); speakWord(word.english); }}
               className="absolute top-4 right-4 p-3 bg-secondary/10 text-secondary rounded-full hover:bg-secondary hover:text-white transition-colors"
@@ -382,7 +387,10 @@ function WordExercise({ word, isFlipped, setIsFlipped }: { word: Word, isFlipped
           </div>
           
           {/* Back */}
-          <div className="absolute inset-0 backface-hidden bg-secondary border-2 border-secondary-dark border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center" style={{ transform: "rotateY(180deg)" }}>
+          <div 
+            className="absolute inset-0 bg-secondary border-2 border-secondary-dark border-b-8 rounded-3xl flex flex-col items-center justify-center p-8 text-center"
+            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+          >
             <span className="text-4xl font-display font-bold text-white mb-6">{word.turkish}</span>
             <div className="bg-white/20 p-4 rounded-xl w-full">
               <div className="flex justify-between items-start mb-2">
