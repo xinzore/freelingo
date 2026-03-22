@@ -6,15 +6,10 @@ import express, {
 } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import pinoHttpModule from "pino-http";
+import pinoHttp from "pino-http";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import router from "./routes";
 import { logger } from "./lib/logger";
-
-// pino-http ESM/CJS uyumluluk düzeltmesi
-const pinoHttp = typeof pinoHttpModule === "function"
-  ? pinoHttpModule
-  : (pinoHttpModule as unknown as { default: typeof pinoHttpModule }).default;
 
 const app: Express = express();
 const NETWORK_ERROR_CODES = new Set(["ENETUNREACH", "ENOTFOUND", "ECONNREFUSED", "ETIMEDOUT"]);
