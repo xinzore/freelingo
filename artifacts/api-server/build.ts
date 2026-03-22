@@ -30,7 +30,6 @@ const allowlist = [
   "passport-local",
   "pg",
   "pino",
-  "pino-http",
   "stripe",
   "uuid",
   "ws",

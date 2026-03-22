@@ -4,9 +4,9 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import { randomUUID } from "crypto";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import pinoHttp from "pino-http";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import router from "./routes";
 import { logger } from "./lib/logger";
@@ -44,25 +44,31 @@ function getApiErrorResponse(error: unknown): { status: number; message: string 
   };
 }
 
-app.use(
-  pinoHttp({
-    logger,
-    serializers: {
-      req(req: any) {
-        return {
-          id: req.id,
+app.use((req, res, next) => {
+  const requestId = randomUUID();
+  const startedAt = process.hrtime.bigint();
+
+  res.on("finish", () => {
+    const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
+
+    logger.info(
+      {
+        req: {
+          id: requestId,
           method: req.method,
-          url: req.url?.split("?")[0],
-        };
-      },
-      res(res: any) {
-        return {
+          url: req.originalUrl.split("?")[0],
+        },
+        res: {
           statusCode: res.statusCode,
-        };
+        },
+        responseTime: Math.round(durationMs),
       },
-    },
-  }),
-);
+      "request completed",
+    );
+  });
+
+  next();
+});
 app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(express.json());

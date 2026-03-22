@@ -5,6 +5,7 @@ import { Resend } from "resend";
 import { db, usersTable, emailAuthTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { createSession, SESSION_COOKIE, SESSION_TTL } from "../lib/auth";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
@@ -293,7 +294,7 @@ router.post("/auth/forgot-password", async (req: Request, res: Response) => {
       `,
     });
   } catch (err) {
-    req.log?.error?.({ err }, "Failed to send reset email");
+    logger.error({ err }, "Failed to send reset email");
   }
 
   res.json({ success: true, message: "E-posta gönderildi (eğer kayıtlıysa)." });
