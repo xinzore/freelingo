@@ -2,14 +2,23 @@
 
 # compiled output
 dist
+build
 tmp
 out-tsc
 *.tsbuildinfo
 .expo
 .expo-shared
+.vite
+.turbo
 
 # dependencies
 node_modules
+
+# environment and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
 
 # IDEs and editors
 /.idea
@@ -32,7 +41,9 @@ node_modules
 /connect.lock
 /coverage
 /libpeerconnection.log
+*.log
 npm-debug.log
+pnpm-debug.log*
 yarn-error.log
 testem.log
 /typings
@@ -44,6 +55,6 @@ Thumbs.db
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
-# Replit
+# local cache
 .cache/
 .local/

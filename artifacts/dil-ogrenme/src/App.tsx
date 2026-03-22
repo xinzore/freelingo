@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@workspace/replit-auth-web";
 import { AuthModal } from "@/components/AuthModal";
 
 // Pages
@@ -14,6 +13,9 @@ import { Profile } from "@/pages/Profile";
 import { Achievements } from "@/pages/Achievements";
 import { Notebook } from "@/pages/Notebook";
 import { Leaderboard } from "@/pages/Leaderboard";
+import { CommunityHub } from "@/pages/CommunityHub";
+import { Studio } from "@/pages/Studio";
+import { CommunityLesson } from "@/pages/CommunityLesson";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -68,6 +70,9 @@ function AppInner() {
           <Route path="/achievements" component={Achievements} />
           <Route path="/notebook" component={() => <Notebook onOpenAuth={() => setAuthModalOpen(true)} />} />
           <Route path="/leaderboard" component={Leaderboard} />
+          <Route path="/community" component={() => <CommunityHub onOpenAuth={() => setAuthModalOpen(true)} />} />
+          <Route path="/community/:id" component={() => <CommunityLesson onOpenAuth={() => setAuthModalOpen(true)} />} />
+          <Route path="/studio" component={() => <Studio onOpenAuth={() => setAuthModalOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>
       </WouterRouter>
@@ -84,8 +89,6 @@ function AppInner() {
 }
 
 function App() {
-  useAuth();
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

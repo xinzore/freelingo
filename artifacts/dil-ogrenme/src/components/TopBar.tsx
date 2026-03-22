@@ -1,7 +1,7 @@
 import { useGetProgress } from "@workspace/api-client-react";
-import { Heart, Diamond, Flame, User as UserIcon } from "lucide-react";
+import { Heart, Diamond, Flame, PenSquare, User as UserIcon } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/hooks/useAuth";
 import { GamifiedButton } from "@/components/ui/gamified-button";
 
 interface TopBarProps {
@@ -16,7 +16,7 @@ export function TopBar({ onOpenAuth }: TopBarProps) {
   return (
     <div className="sticky top-0 z-50 w-full bg-white border-b-2 border-border/60 shadow-sm px-4 py-3 flex items-center justify-between max-w-3xl mx-auto rounded-b-2xl">
       <Link href="/" className="font-display font-bold text-2xl text-primary flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-        DuoTR
+        FreeLingo
       </Link>
       
       <div className="flex items-center gap-3 md:gap-6">
@@ -36,6 +36,13 @@ export function TopBar({ onOpenAuth }: TopBarProps) {
         </div>
 
         <div className="w-px h-6 bg-border mx-1"></div>
+
+        <Link href="/community">
+          <div className="hidden sm:flex items-center gap-2 rounded-xl border-2 border-border bg-gray-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-gray-600 hover:bg-white">
+            <PenSquare className="w-4 h-4" />
+            Topluluk
+          </div>
+        </Link>
 
         {!isAuthenticated ? (
           <GamifiedButton size="sm" onClick={onOpenAuth} className="px-3 py-1 text-sm">

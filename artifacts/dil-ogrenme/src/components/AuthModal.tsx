@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Eye, EyeOff, Mail, Lock, User, ChevronRight } from "lucide-react";
-import { useAuth } from "@workspace/replit-auth-web";
 
 type ModalView = "choice" | "login" | "register" | "forgot" | "reset" | "verify-sent" | "reset-sent";
 
@@ -53,7 +52,6 @@ function Input({
 }
 
 export function AuthModal({ open, onClose, initialView = "choice", resetToken }: Props) {
-  const { login } = useAuth();
   const [view, setView] = useState<ModalView>(initialView);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -241,20 +239,9 @@ export function AuthModal({ open, onClose, initialView = "choice", resetToken }:
               <div className="space-y-4">
                 <div className="text-center mb-6">
                   <div className="text-5xl mb-3">🦉</div>
-                  <h2 className="text-2xl font-bold text-gray-800">DuoTR'ye Hoş Geldin!</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">FreeLingo'ya Hoş Geldin!</h2>
                   <p className="text-gray-500 mt-1">İlerlemeyi kaydetmek için giriş yap</p>
                 </div>
-
-                <button
-                  onClick={() => login()}
-                  className="w-full flex items-center justify-between bg-[#1877F2] text-white py-4 px-5 rounded-2xl font-semibold text-base hover:opacity-90 active:scale-95 transition-all"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="text-xl">🔷</span>
-                    Replit ile Giriş Yap
-                  </span>
-                  <ChevronRight size={18} />
-                </button>
 
                 <button
                   onClick={() => { resetForm(); setView("login"); }}
@@ -263,6 +250,17 @@ export function AuthModal({ open, onClose, initialView = "choice", resetToken }:
                   <span className="flex items-center gap-3">
                     <Mail size={20} />
                     E-posta ile Giriş Yap
+                  </span>
+                  <ChevronRight size={18} />
+                </button>
+
+                <button
+                  onClick={() => { resetForm(); setView("register"); }}
+                  className="w-full flex items-center justify-between bg-[#58CC02] text-white py-4 px-5 rounded-2xl font-semibold text-base hover:bg-[#46a302] active:scale-95 transition-all"
+                >
+                  <span className="flex items-center gap-3">
+                    <User size={20} />
+                    Yeni Hesap Oluştur
                   </span>
                   <ChevronRight size={18} />
                 </button>

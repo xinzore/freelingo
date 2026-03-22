@@ -21,22 +21,6 @@ export interface GetCurrentAuthUserResponse {
   user: AuthUser | null;
 }
 
-export interface ExchangeMobileAuthorizationCodeBody {
-  code: string;
-  code_verifier: string;
-  redirect_uri: string;
-  state: string;
-  nonce?: string | null;
-}
-
-export interface ExchangeMobileAuthorizationCodeResponse {
-  token: string;
-}
-
-export interface LogoutMobileSessionResponse {
-  success: boolean;
-}
-
 export type LessonDifficulty =
   (typeof LessonDifficulty)[keyof typeof LessonDifficulty];
 
@@ -75,6 +59,7 @@ export const QuestionType = {
   "translate-to-turkish": "translate-to-turkish",
   "multiple-choice": "multiple-choice",
   "fill-blank": "fill-blank",
+  "listen-and-write": "listen-and-write",
 } as const;
 
 export interface Question {

@@ -8,14 +8,19 @@ import { createSession, SESSION_COOKIE, SESSION_TTL } from "../lib/auth";
 
 const router: IRouter = Router();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key_for_dev");
 
-const FROM_EMAIL = "DuoTR <onboarding@resend.dev>";
+const FROM_EMAIL = "FreeLingo <onboarding@resend.dev>";
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 function getOrigin(req: Request): string {
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
+  const forwardedProtoHeader = req.headers["x-forwarded-proto"];
+  const forwardedProto = Array.isArray(forwardedProtoHeader)
+    ? forwardedProtoHeader[0]
+    : forwardedProtoHeader?.split(",")[0]?.trim();
+  const hostHeader = req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
+  const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
+  const proto = forwardedProto || req.protocol || "http";
   return `${proto}://${host}`;
 }
 
@@ -110,7 +115,6 @@ router.post("/auth/register", async (req: Request, res: Response) => {
         lastName,
         profileImageUrl: null,
       },
-      access_token: "email-auth",
     };
     const sid = await createSession(sessionData);
     setSessionCookie(res, sid);
@@ -123,15 +127,15 @@ router.post("/auth/register", async (req: Request, res: Response) => {
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: "DuoTR - E-posta Adresini Doğrula",
+      subject: "FreeLingo - E-posta Adresini Doğrula",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #58CC02; font-size: 32px;">🦉 DuoTR</h1>
+            <h1 style="color: #58CC02; font-size: 32px;">🦉 FreeLingo</h1>
           </div>
           <h2 style="color: #333;">Merhaba ${firstName}!</h2>
           <p style="color: #555; font-size: 16px; line-height: 1.5;">
-            DuoTR'ye hoş geldin! Hesabını aktifleştirmek için aşağıdaki butona tıkla.
+            FreeLingo'ya hoş geldin! Hesabını aktifleştirmek için aşağıdaki butona tıkla.
           </p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verifyUrl}" 
@@ -196,7 +200,6 @@ router.post("/auth/login-email", async (req: Request, res: Response) => {
       lastName: user.lastName,
       profileImageUrl: user.profileImageUrl,
     },
-    access_token: "email-auth",
   };
 
   const sid = await createSession(sessionData);
@@ -267,11 +270,11 @@ router.post("/auth/forgot-password", async (req: Request, res: Response) => {
     await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: "DuoTR - Şifre Sıfırlama",
+      subject: "FreeLingo - Şifre Sıfırlama",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #58CC02; font-size: 32px;">🦉 DuoTR</h1>
+            <h1 style="color: #58CC02; font-size: 32px;">🦉 FreeLingo</h1>
           </div>
           <h2 style="color: #333;">Şifre Sıfırlama</h2>
           <p style="color: #555; font-size: 16px; line-height: 1.5;">

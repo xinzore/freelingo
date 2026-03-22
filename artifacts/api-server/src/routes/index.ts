@@ -7,6 +7,7 @@ import progressRouter from "./progress";
 import achievementsRouter from "./achievements";
 import notebookRouter from "./notebook";
 import leaderboardRouter from "./leaderboard";
+import communityLessonsRouter from "./communityLessons";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(progressRouter);
 router.use(achievementsRouter);
 router.use(notebookRouter);
 router.use(leaderboardRouter);
+router.use(communityLessonsRouter);
 
 export default router;

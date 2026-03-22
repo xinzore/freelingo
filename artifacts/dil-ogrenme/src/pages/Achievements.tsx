@@ -20,7 +20,7 @@ export function Achievements() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 w-full">
-            {achievements?.map((achievement) => {
+            {(Array.isArray(achievements) ? achievements : [])?.map((achievement) => {
               const isUnlocked = !!achievement.unlockedAt;
               
               return (
@@ -37,7 +37,7 @@ export function Achievements() {
                     {achievement.icon}
                   </div>
                   <h3 className="font-display font-bold text-gray-800 mb-1 leading-tight">
-                    {achievement.name}
+                    {achievement.title}
                   </h3>
                   <p className="text-xs text-gray-500 font-medium mb-3">
                     {achievement.description}

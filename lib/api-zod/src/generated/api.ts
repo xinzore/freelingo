@@ -31,28 +31,6 @@ export const GetCurrentAuthUserResponse = zod.object({
 });
 
 /**
- * @summary Exchange mobile authorization code for session token
- */
-export const ExchangeMobileAuthorizationCodeBody = zod.object({
-  code: zod.string(),
-  code_verifier: zod.string(),
-  redirect_uri: zod.string(),
-  state: zod.string(),
-  nonce: zod.string().nullish(),
-});
-
-export const ExchangeMobileAuthorizationCodeResponse = zod.object({
-  token: zod.string(),
-});
-
-/**
- * @summary Logout mobile session
- */
-export const LogoutMobileSessionResponse = zod.object({
-  success: zod.boolean(),
-});
-
-/**
  * @summary Register with email and password
  */
 export const RegisterWithEmailBody = zod.object({
@@ -165,6 +143,7 @@ export const GetLessonResponse = zod.object({
         "translate-to-turkish",
         "multiple-choice",
         "fill-blank",
+        "listen-and-write",
       ]),
       question: zod.string(),
       options: zod.array(zod.string()).optional(),

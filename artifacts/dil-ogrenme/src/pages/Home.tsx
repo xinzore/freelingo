@@ -6,6 +6,7 @@ import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { PenSquare, Users } from "lucide-react";
 
 interface HomeProps {
   onOpenAuth?: () => void;
@@ -25,10 +26,11 @@ export function Home({ onOpenAuth }: HomeProps) {
 
   // Find the first uncompleted lesson to mark as "current"
   const completedIds = progress?.completedLessons || [];
-  const currentLessonId = lessons?.find(l => !completedIds.includes(l.id))?.id;
+  const lessonsArray = Array.isArray(lessons) ? lessons : [];
+  const currentLessonId = lessonsArray.find(l => !completedIds.includes(l.id))?.id;
 
-  const dailyXp = progress?.dailyXp || 0;
-  const dailyGoal = progress?.dailyGoal || 50;
+  const dailyXp = progress?.dailyXpEarned || 0;
+  const dailyGoal = progress?.dailyGoalXp || 50;
   const goalProgress = Math.min((dailyXp / dailyGoal) * 100, 100);
   const goalCompleted = dailyXp >= dailyGoal;
 
@@ -74,8 +76,33 @@ export function Home({ onOpenAuth }: HomeProps) {
           />
         </div>
 
+        <div className="w-full grid gap-4 mb-4 md:grid-cols-2">
+          <Link href="/community">
+            <div className="rounded-[1.75rem] border-2 border-sky-200 bg-[linear-gradient(135deg,#f5fbff_0%,#f1fff9_100%)] p-5 shadow-sm cursor-pointer">
+              <Users className="w-7 h-7 text-sky-500 mb-3" />
+              <div className="font-display text-xl font-bold text-gray-800">Topluluktan Ogren</div>
+              <p className="mt-2 text-sm font-medium leading-6 text-gray-500">
+                Kullanicilarin hazirladigi yeni alistirmalari ve mini kurslari kesfet.
+              </p>
+            </div>
+          </Link>
+
+          {onOpenAuth ? (
+            <button
+              onClick={() => window.location.assign("/studio")}
+              className="rounded-[1.75rem] border-2 border-lime-200 bg-[linear-gradient(135deg,#f8fff1_0%,#fff9ef_100%)] p-5 shadow-sm text-left"
+            >
+              <PenSquare className="w-7 h-7 text-lime-600 mb-3" />
+              <div className="font-display text-xl font-bold text-gray-800">Icerik Uret</div>
+              <p className="mt-2 text-sm font-medium leading-6 text-gray-500">
+                Coktan secmeli, eslestirme, bosluk doldurma ve ceviri alistirmalari tasarla.
+              </p>
+            </button>
+          ) : null}
+        </div>
+
         <div className="flex flex-col gap-8 w-full py-8">
-          {lessons?.map((lesson, index) => {
+          {lessonsArray?.map((lesson, index) => {
             // Create a zigzag pattern
             const isLeft = index % 2 === 0;
             const offset = Math.sin(index * 0.8) * 60;
@@ -133,7 +160,7 @@ export function Home({ onOpenAuth }: HomeProps) {
                 </motion.div>
 
                 {/* Connecting Path Line - SVG drawn behind nodes */}
-                {index < lessons.length - 1 && (
+                {index < lessonsArray.length - 1 && (
                   <svg className="absolute w-full h-32 -bottom-20 left-0 -z-10 pointer-events-none" viewBox="0 0 400 128" preserveAspectRatio="none">
                     <path 
                       d={`M ${200 + offset} 0 C ${200 + offset} 64, ${200 + (Math.sin((index + 1) * 0.8) * 60)} 64, ${200 + (Math.sin((index + 1) * 0.8) * 60)} 128`} 

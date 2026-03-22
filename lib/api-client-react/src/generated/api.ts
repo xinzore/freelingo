@@ -24,15 +24,12 @@ import type {
   CompleteLessonRequest,
   EmailLoginRequest,
   EmailRegisterRequest,
-  ExchangeMobileAuthorizationCodeBody,
-  ExchangeMobileAuthorizationCodeResponse,
   ForgotPasswordRequest,
   GetCurrentAuthUserResponse,
   HealthStatus,
   LeaderboardEntry,
   Lesson,
   LessonDetail,
-  LogoutMobileSessionResponse,
   NotebookWord,
   ResetPasswordRequest,
   ResetResult,
@@ -199,179 +196,6 @@ export function useGetCurrentAuthUser<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-/**
- * @summary Exchange mobile authorization code for session token
- */
-export const getExchangeMobileAuthorizationCodeUrl = () => {
-  return `/api/mobile-auth/token-exchange`;
-};
-
-export const exchangeMobileAuthorizationCode = async (
-  exchangeMobileAuthorizationCodeBody: ExchangeMobileAuthorizationCodeBody,
-  options?: RequestInit,
-): Promise<ExchangeMobileAuthorizationCodeResponse> => {
-  return customFetch<ExchangeMobileAuthorizationCodeResponse>(
-    getExchangeMobileAuthorizationCodeUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(exchangeMobileAuthorizationCodeBody),
-    },
-  );
-};
-
-export const getExchangeMobileAuthorizationCodeMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
-    TError,
-    { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
-  TError,
-  { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
-  TContext
-> => {
-  const mutationKey = ["exchangeMobileAuthorizationCode"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
-    { data: BodyType<ExchangeMobileAuthorizationCodeBody> }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return exchangeMobileAuthorizationCode(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ExchangeMobileAuthorizationCodeMutationResult = NonNullable<
-  Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>
->;
-export type ExchangeMobileAuthorizationCodeMutationBody =
-  BodyType<ExchangeMobileAuthorizationCodeBody>;
-export type ExchangeMobileAuthorizationCodeMutationError = ErrorType<unknown>;
-
-/**
- * @summary Exchange mobile authorization code for session token
- */
-export const useExchangeMobileAuthorizationCode = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
-    TError,
-    { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
-  TError,
-  { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
-  TContext
-> => {
-  return useMutation(
-    getExchangeMobileAuthorizationCodeMutationOptions(options),
-  );
-};
-
-/**
- * @summary Logout mobile session
- */
-export const getLogoutMobileSessionUrl = () => {
-  return `/api/mobile-auth/logout`;
-};
-
-export const logoutMobileSession = async (
-  options?: RequestInit,
-): Promise<LogoutMobileSessionResponse> => {
-  return customFetch<LogoutMobileSessionResponse>(getLogoutMobileSessionUrl(), {
-    ...options,
-    method: "POST",
-  });
-};
-
-export const getLogoutMobileSessionMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof logoutMobileSession>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof logoutMobileSession>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ["logoutMobileSession"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof logoutMobileSession>>,
-    void
-  > = () => {
-    return logoutMobileSession(requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type LogoutMobileSessionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof logoutMobileSession>>
->;
-
-export type LogoutMobileSessionMutationError = ErrorType<unknown>;
-
-/**
- * @summary Logout mobile session
- */
-export const useLogoutMobileSession = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof logoutMobileSession>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof logoutMobileSession>>,
-  TError,
-  void,
-  TContext
-> => {
-  return useMutation(getLogoutMobileSessionMutationOptions(options));
-};
 
 /**
  * @summary Register with email and password

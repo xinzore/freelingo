@@ -13,4 +13,5 @@ export const QuestionType = {
   "translate-to-turkish": "translate-to-turkish",
   "multiple-choice": "multiple-choice",
   "fill-blank": "fill-blank",
+  "listen-and-write": "listen-and-write",
 } as const;

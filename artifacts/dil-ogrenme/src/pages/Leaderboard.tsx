@@ -3,7 +3,7 @@ import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { User as UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Leaderboard() {
   const { data: leaderboard, isLoading } = useGetLeaderboard();
@@ -23,7 +23,7 @@ export function Leaderboard() {
           </div>
         ) : (
           <div className="w-full flex flex-col gap-2">
-            {leaderboard?.map((entry, index) => {
+            {(Array.isArray(leaderboard) ? leaderboard : [])?.map((entry, index) => {
               const isTop3 = index < 3;
               const rankColors = [
                 "bg-yellow-100 text-yellow-600 border-yellow-200", // 1st
@@ -52,8 +52,8 @@ export function Leaderboard() {
                   </div>
                   
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-2 border-border shrink-0">
-                    {entry.profileImage ? (
-                      <img src={entry.profileImage} alt={entry.name} className="w-full h-full object-cover" />
+                    {entry.profileImageUrl ? (
+                      <img src={entry.profileImageUrl} alt={entry.displayName} className="w-full h-full object-cover" />
                     ) : (
                       <UserIcon className="w-6 h-6 text-gray-400" />
                     )}
@@ -64,13 +64,13 @@ export function Leaderboard() {
                       "font-display font-bold truncate",
                       isUser ? "text-primary" : "text-gray-800"
                     )}>
-                      {entry.name} {isUser && "(Sen)"}
+                      {entry.displayName} {isUser && "(Sen)"}
                     </h3>
                     <p className="text-xs text-gray-500 font-medium">Seviye {entry.level}</p>
                   </div>
                   
                   <div className="text-right">
-                    <div className="font-display font-bold text-gray-800">{entry.weeklyXp} XP</div>
+                    <div className="font-display font-bold text-gray-800">{entry.xp} XP</div>
                   </div>
                 </div>
               );

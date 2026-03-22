@@ -99,6 +99,30 @@ const lessonsData = [
     locked: true,
     icon: "👩‍💼",
   },
+  {
+    id: 9,
+    title: "Mutfak Gereçleri",
+    description: "Mutfakta en çok kullanılan eşyaların isimlerini öğren",
+    category: "Günlük Hayat",
+    difficulty: "intermediate" as const,
+    xpReward: 20,
+    wordCount: 8,
+    completed: false,
+    locked: true,
+    icon: "🍳",
+  },
+  {
+    id: 10,
+    title: "Hava Durumu",
+    description: "İngilizce hava durumu ifadelerini öğren",
+    category: "Doğa",
+    difficulty: "intermediate" as const,
+    xpReward: 20,
+    wordCount: 8,
+    completed: false,
+    locked: true,
+    icon: "🌦️",
+  },
 ];
 
 const lessonDetailsData: Record<number, { words: object[]; questions: object[] }> = {
@@ -118,6 +142,7 @@ const lessonDetailsData: Record<number, { words: object[]; questions: object[] }
       { id: 4, type: "translate-to-english", question: "\"Lütfen\" kelimesinin İngilizcesi nedir?", options: ["Sorry", "Please", "Thank you", "Goodbye"], correctAnswer: "Please", hint: "Kibarca istekte bulunmak için kullanılır" },
       { id: 5, type: "fill-blank", question: "\"___, I am late.\" (Özür dilerim, geç kaldım.)", options: ["Hello", "Please", "Sorry", "Thank you"], correctAnswer: "Sorry", hint: "Özür belirten kelime" },
       { id: 6, type: "translate-to-turkish", question: "\"Good night\" ne anlama gelir?", options: ["Günaydın", "İyi günler", "İyi geceler", "Hoşça kal"], correctAnswer: "İyi geceler", hint: "Geceleri kullanılır" },
+      { id: 7, type: "listen-and-write", question: "Thank you", correctAnswer: "Thank you", hint: "Duydupunu yaz" },
     ],
   },
   2: {
@@ -243,6 +268,38 @@ const lessonDetailsData: Record<number, { words: object[]; questions: object[] }
     questions: [
       { id: 1, type: "translate-to-english", question: "\"Öğretmen\" kelimesinin İngilizcesi nedir?", options: ["Doctor", "Engineer", "Teacher", "Nurse"], correctAnswer: "Teacher", hint: "Okullarda çalışır" },
       { id: 2, type: "translate-to-turkish", question: "\"Pilot\" ne anlama gelir?", options: ["Kaptan", "Pilot", "Sürücü", "Teknisyen"], correctAnswer: "Pilot", hint: "Uçak kullanır" },
+    ],
+  },
+  9: {
+    words: [
+      { id: 1, english: "Fork", turkish: "Çatal", pronunciation: "FORK", example: "I eat with a fork.", exampleTurkish: "Çatal ile yerim." },
+      { id: 2, english: "Knife", turkish: "Bıçak", pronunciation: "NAYF", example: "The knife is sharp.", exampleTurkish: "Bıçak keskindir." },
+      { id: 3, english: "Spoon", turkish: "Kaşık", pronunciation: "SPOON", example: "I use a spoon for soup.", exampleTurkish: "Çorba için kaşık kullanırım." },
+      { id: 4, english: "Plate", turkish: "Tabak", pronunciation: "PLAYT", example: "Put the food on the plate.", exampleTurkish: "Yemeği tabağa koy." },
+      { id: 5, english: "Glass", turkish: "Bardak", pronunciation: "GLAS", example: "A glass of water, please.", exampleTurkish: "Bir bardak su, lütfen." },
+      { id: 6, english: "Pan", turkish: "Tava", pronunciation: "PAN", example: "I fry eggs in a pan.", exampleTurkish: "Yumurtayı tavada kızartırım." },
+      { id: 7, english: "Pot", turkish: "Tencere", pronunciation: "POT", example: "The soup is in the pot.", exampleTurkish: "Çorba tencerenin içinde." },
+      { id: 8, english: "Bowl", turkish: "Kase", pronunciation: "BOWL", example: "A bowl of cereal.", exampleTurkish: "Bir kase mısır gevreği." },
+    ],
+    questions: [
+      { id: 1, type: "translate-to-english", question: "\"Çatal\" kelimesinin İngilizcesi nedir?", options: ["Knife", "Fork", "Spoon", "Plate"], correctAnswer: "Fork", hint: "Yemek yemek için kullanılan dişli araç" },
+      { id: 2, type: "translate-to-turkish", question: "\"Knife\" ne anlama gelir?", options: ["Kaşık", "Tabak", "Bıçak", "Tava"], correctAnswer: "Bıçak", hint: "Kesmek için kullanılır" },
+    ],
+  },
+  10: {
+    words: [
+      { id: 1, english: "Sunny", turkish: "Güneşli", pronunciation: "SUN-ee", example: "It is a sunny day.", exampleTurkish: "Güneşli bir gün." },
+      { id: 2, english: "Rainy", turkish: "Yağmurlu", pronunciation: "RAY-nee", example: "Take an umbrella, it's rainy.", exampleTurkish: "Şemsiye al, hava yağmurlu." },
+      { id: 3, english: "Cloudy", turkish: "Bulutlu", pronunciation: "KLOW-dee", example: "The sky is cloudy.", exampleTurkish: "Gökyüzü bulutlu." },
+      { id: 4, english: "Snowy", turkish: "Karlı", pronunciation: "SNOW-ee", example: "We like snowy weather.", exampleTurkish: "Karlı havayı severiz." },
+      { id: 5, english: "Windy", turkish: "Rüzgarlı", pronunciation: "WIN-dee", example: "It is very windy today.", exampleTurkish: "Bugün hava çok rüzgarlı." },
+      { id: 6, english: "Hot", turkish: "Sıcak", pronunciation: "HOT", example: "The weather is hot.", exampleTurkish: "Hava sıcak." },
+      { id: 7, english: "Cold", turkish: "Soğuk", pronunciation: "KOLD", example: "It is cold in winter.", exampleTurkish: "Kışın hava soğuktur." },
+      { id: 8, english: "Stormy", turkish: "Fırtınalı", pronunciation: "STOR-mee", example: "The night was stormy.", exampleTurkish: "Gece fırtınalıydı." },
+    ],
+    questions: [
+      { id: 1, type: "translate-to-english", question: "\"Yağmurlu\" kelimesinin İngilizcesi nedir?", options: ["Sunny", "Rainy", "Cloudy", "Snowy"], correctAnswer: "Rainy", hint: "Yağmur yağan hava" },
+      { id: 2, type: "translate-to-turkish", question: "\"Cold\" ne anlama gelir?", options: ["Sıcak", "Ilık", "Soğuk", "Serin"], correctAnswer: "Soğuk", hint: "Kışın hissedilen durum" },
     ],
   },
 };

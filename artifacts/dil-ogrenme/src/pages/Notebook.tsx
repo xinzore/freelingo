@@ -3,7 +3,7 @@ import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { GamifiedButton } from "@/components/ui/gamified-button";
 import { Volume2, Trash2, BookX } from "lucide-react";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NotebookProps {
   onOpenAuth?: () => void;
@@ -16,14 +16,16 @@ export function Notebook({ onOpenAuth }: NotebookProps) {
 
   const speakWord = (text: string) => {
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
       utterance.rate = 0.8;
+      (window as any)._lastUtterance = utterance;
       window.speechSynthesis.speak(utterance);
     }
   };
 
-  const handleRemove = async (id: number) => {
+  const handleRemove = async (id: string) => {
     await removeMutation.mutateAsync({ id });
     refetch();
   };
@@ -50,7 +52,7 @@ export function Notebook({ onOpenAuth }: NotebookProps) {
           <div className="flex items-center justify-center p-12">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : !notebookWords || notebookWords.length === 0 ? (
+        ) : !Array.isArray(notebookWords) || notebookWords.length === 0 ? (
           <div className="w-full bg-white border-2 border-border rounded-2xl p-8 text-center flex flex-col items-center">
             <BookX className="w-16 h-16 text-gray-300 mb-4" />
             <h2 className="text-xl font-display font-bold text-gray-700 mb-2">Defterin Boş</h2>
@@ -65,14 +67,14 @@ export function Notebook({ onOpenAuth }: NotebookProps) {
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
                     <button 
-                      onClick={() => speakWord(item.word.english)}
+                      onClick={() => speakWord(item.english)}
                       className="p-2 bg-secondary/10 text-secondary rounded-full hover:bg-secondary hover:text-white transition-colors"
                     >
                       <Volume2 className="w-5 h-5" />
                     </button>
                     <div>
-                      <h3 className="font-display font-bold text-xl text-gray-800">{item.word.english}</h3>
-                      <p className="text-sm text-gray-400 font-medium">[{item.word.pronunciation}]</p>
+                      <h3 className="font-display font-bold text-xl text-gray-800">{item.english}</h3>
+                      <p className="text-sm text-gray-400 font-medium">[{item.pronunciation}]</p>
                     </div>
                   </div>
                   <button 
@@ -85,10 +87,10 @@ export function Notebook({ onOpenAuth }: NotebookProps) {
                 </div>
                 
                 <div className="pl-12">
-                  <p className="font-display font-bold text-primary mb-2 text-lg">{item.word.turkish}</p>
+                  <p className="font-display font-bold text-primary mb-2 text-lg">{item.turkish}</p>
                   <div className="bg-gray-50 p-3 rounded-xl border-2 border-gray-100">
-                    <p className="text-gray-700 italic text-sm mb-1">"{item.word.example}"</p>
-                    <p className="text-gray-500 text-xs">"{item.word.exampleTurkish}"</p>
+                    <p className="text-gray-700 italic text-sm mb-1">"{item.example}"</p>
+                    <p className="text-gray-500 text-xs">"{item.addedAt}"</p>
                   </div>
                 </div>
               </div>

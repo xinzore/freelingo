@@ -21,6 +21,8 @@ tags:
     description: Word notebook operations
   - name: leaderboard
     description: Leaderboard operations
+  - name: community
+    description: Community lesson authoring and discovery
 paths:
   /healthz:
     get:
@@ -46,36 +48,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetCurrentAuthUserResponse"
-  /mobile-auth/token-exchange:
-    post:
-      operationId: exchangeMobileAuthorizationCode
-      tags: [auth]
-      summary: Exchange mobile authorization code for session token
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeBody"
-      responses:
-        "200":
-          description: Session token
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeResponse"
-  /mobile-auth/logout:
-    post:
-      operationId: logoutMobileSession
-      tags: [auth]
-      summary: Logout mobile session
-      responses:
-        "200":
-          description: Logout result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LogoutMobileSessionResponse"
   /auth/register:
     post:
       operationId: registerWithEmail
@@ -359,6 +331,122 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/LeaderboardEntry"
+  /community-lessons:
+    get:
+      operationId: getCommunityLessons
+      tags: [community]
+      summary: Get published community lessons
+      responses:
+        "200":
+          description: Published community lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommunityLessonSummary"
+    post:
+      operationId: createCommunityLesson
+      tags: [community]
+      summary: Create a community lesson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunityLessonInput"
+      responses:
+        "201":
+          description: Created lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunityLessonDetail"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
+  /community-lessons/mine:
+    get:
+      operationId: getMyCommunityLessons
+      tags: [community]
+      summary: Get current user's community lessons
+      responses:
+        "200":
+          description: Owned drafts and published lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommunityLessonSummary"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
+  /community-lessons/{id}:
+    get:
+      operationId: getCommunityLesson
+      tags: [community]
+      summary: Get a published lesson or an owned draft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Full lesson payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunityLessonDetail"
+        "404":
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
+    put:
+      operationId: updateCommunityLesson
+      tags: [community]
+      summary: Update an owned community lesson
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunityLessonInput"
+      responses:
+        "200":
+          description: Updated lesson
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunityLessonDetail"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
+        "403":
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthError"
 components:
   schemas:
     HealthStatus:
@@ -393,33 +481,6 @@ components:
             - $ref: "#/components/schemas/AuthUser"
             - type: "null"
       required: [user]
-    ExchangeMobileAuthorizationCodeBody:
-      type: object
-      properties:
-        code:
-          type: string
-        code_verifier:
-          type: string
-        redirect_uri:
-          type: string
-        state:
-          type: string
-        nonce:
-          type: string
-          nullable: true
-      required: [code, code_verifier, redirect_uri, state]
-    ExchangeMobileAuthorizationCodeResponse:
-      type: object
-      properties:
-        token:
-          type: string
-      required: [token]
-    LogoutMobileSessionResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-      required: [success]
     Lesson:
       type: object
       properties:
@@ -468,7 +529,7 @@ components:
           type: integer
         type:
           type: string
-          enum: [translate-to-english, translate-to-turkish, multiple-choice, fill-blank]
+          enum: [translate-to-english, translate-to-turkish, multiple-choice, fill-blank, listen-and-write]
         question:
           type: string
         options:
@@ -680,3 +741,179 @@ components:
         isCurrentUser:
           type: boolean
       required: [rank, userId, displayName, xp, level, streak, isCurrentUser]
+    CommunityWord:
+      type: object
+      properties:
+        id:
+          type: string
+        term:
+          type: string
+        translation:
+          type: string
+        example:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+      required: [id, term, translation]
+    CommunityExercisePair:
+      type: object
+      properties:
+        id:
+          type: string
+        left:
+          type: string
+        right:
+          type: string
+      required: [id, left, right]
+    CommunityExercise:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [multiple-choice, matching, fill-blank, speech-to-text, translate-written]
+        prompt:
+          type: string
+        instructions:
+          type: string
+          nullable: true
+        options:
+          type: array
+          items:
+            type: string
+        correctAnswers:
+          type: array
+          items:
+            type: string
+        pairs:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommunityExercisePair"
+        voiceText:
+          type: string
+          nullable: true
+        sourceText:
+          type: string
+          nullable: true
+        hint:
+          type: string
+          nullable: true
+        explanation:
+          type: string
+          nullable: true
+      required: [id, type, prompt]
+    CommunityAuthor:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id, name]
+    CommunityLessonSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        sourceLanguage:
+          type: string
+        targetLanguage:
+          type: string
+        icon:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        objectives:
+          type: array
+          items:
+            type: string
+        estimatedMinutes:
+          type: integer
+        playCount:
+          type: integer
+        isPublished:
+          type: boolean
+        wordCount:
+          type: integer
+        exerciseCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        isOwner:
+          type: boolean
+        author:
+          $ref: "#/components/schemas/CommunityAuthor"
+      required:
+        [id, title, description, category, difficulty, sourceLanguage, targetLanguage, icon, tags, objectives, estimatedMinutes, playCount, isPublished, wordCount, exerciseCount, createdAt, updatedAt, isOwner, author]
+    CommunityLessonDetail:
+      allOf:
+        - $ref: "#/components/schemas/CommunityLessonSummary"
+        - type: object
+          properties:
+            words:
+              type: array
+              items:
+                $ref: "#/components/schemas/CommunityWord"
+            exercises:
+              type: array
+              items:
+                $ref: "#/components/schemas/CommunityExercise"
+          required: [words, exercises]
+    CommunityLessonInput:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        sourceLanguage:
+          type: string
+        targetLanguage:
+          type: string
+        icon:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        objectives:
+          type: array
+          items:
+            type: string
+        estimatedMinutes:
+          type: integer
+        isPublished:
+          type: boolean
+        words:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommunityWord"
+        exercises:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommunityExercise"
+      required:
+        [title, description, category, difficulty, sourceLanguage, targetLanguage, icon, tags, objectives, estimatedMinutes, isPublished, words, exercises]

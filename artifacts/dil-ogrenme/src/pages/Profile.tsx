@@ -3,7 +3,7 @@ import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { GamifiedButton } from "@/components/ui/gamified-button";
 import { Flame, Diamond, BookOpen, Award, Target, LogOut, AlertTriangle, User as UserIcon } from "lucide-react";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface ProfileProps {
