@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development tsx ./src/index.ts",
-    "build": "tsx ./build.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "build:deps": "pnpm exec tsc --build --force ../../lib/db ../../lib/api-zod",
+    "build": "pnpm run build:deps && tsx ./build.ts",
+    "typecheck": "pnpm run build:deps && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@workspace/api-zod": "workspace:*",
